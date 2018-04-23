@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Define laser type-->
+  <arg name="laser_type" default="rplidar" />
+
+  <!-- laser driver -->
+  <include file="$(find slam_gampping)/laser/$(arg laser_type)_laser.launch" />
+
+  <!-- Map server -->
+  <arg name="map_file" default="$(env MAP_FILE)"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- AMCL -->
+  <arg name="custom_amcl_launch_file" default="$(find slam_gampping)/launch/$(arg laser_type)_amcl.launch.xml"/>
+  <arg name="initial_pose_x" default="0.0"/> <!-- Use 17.0 for willow's map in simulation -->
+  <arg name="initial_pose_y" default="0.0"/> <!-- Use 17.0 for willow's map in simulation -->
+  <arg name="initial_pose_a" default="0.0"/>
+  <include file="$(arg custom_amcl_launch_file)">
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+  </include>
+
+</launch>

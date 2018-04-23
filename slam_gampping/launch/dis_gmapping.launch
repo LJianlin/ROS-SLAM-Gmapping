@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<launch>
+  
+<!-- arduino.launch-->
+ <node name="arduino" pkg="ros_arduino_python" type="arduino_node.py" output="screen">
+      <rosparam file="$(find ros_arduino_python)/config/my_arduino_params.yaml" command="load" />
+   </node>
+<!-- rplidar_gmapping.launch-->
+  <!-- Define laser type-->
+  <arg name="laser_type" default="rplidar" />
+
+  <!-- laser driver -->
+  <include file="$(find slam_gampping)/laser/$(arg laser_type)_laser.launch" />
+
+  <!-- Gmapping -->
+  <arg name="custom_gmapping_launch_file" default="$(find slam_gampping)/launch/$(arg laser_type)_gmapping.launch.xml"/>
+  <include file="$(arg custom_gmapping_launch_file)"/>
+  <!-- Move base -->
+  <include file="$(find slam_gampping)/launch/move_base.launch.xml"/>
+
+<!-- diaplay.launch-->
+	<arg name="model" default="$(find robot1_description)/urdf/robot1.urdf" />
+	<arg name="gui" default="False" />
+	<param name="robot_description" textfile="$(arg model)" />
+	<param name="use_gui" value="$(arg gui)"/>
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" />
+	
+  <!-- joy_node.py-->
+  <node name="joystick" pkg="joy" type="joy_node" >
+       <param name="deadzone" value="0.0" />
+    </node>
+    
+  <!-- cmd_control.py-->
+  <node name="cmd_control" pkg="cmd_control" type="cmdtest.py" >
+    </node>
+    
+</launch>
